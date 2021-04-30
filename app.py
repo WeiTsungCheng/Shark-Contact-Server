@@ -1,11 +1,12 @@
 from flask import Flask, jsonify
 from flask_restful import Api
 
-# from flask_jwt_extended import JWTManager
+from flask_jwt_extended import JWTManager
 
 from db import db
 
-from resources.user import UserRegister, User
+from resources.user import UserRegister, User, UserLogin, UserLogout, TokenRefresh
+
 
 app = Flask(__name__)
 
@@ -20,21 +21,13 @@ api = Api(app)
 def create_tables():
     db.create_all()
 
-
-# jwt = JWTManager(app)
-
-# @app.route('/test')
-# def index():
-#     sql_cmd = """
-#         select * from public.users
-#         """
-#     query_data = db.engine.execute(sql_cmd)
-#     print(query_data)
-#     return 'ok'
+jwt = JWTManager(app)
 
 api.add_resource(UserRegister, '/register')
 api.add_resource(User, '/user/<uuid:user_id>')
-# api.add_resource(UserLogin, '/login')
+api.add_resource(UserLogin, '/login')
+api.add_resource(TokenRefresh, '/refresh')
+api.add_resource(UserLogout, "/logout")
 
 if __name__ == '__main__':
     db.init_app(app)

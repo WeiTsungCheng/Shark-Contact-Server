@@ -4,11 +4,23 @@ from db import db
 from sqlalchemy.dialects.postgresql import UUID
 from uuid import uuid4
 
+from werkzeug.security import generate_password_hash
+
 class UserModel(db.Model):
     __tablename__ = "users"
     id = db.Column(UUID(as_uuid=True), default=lambda: uuid4().hex, primary_key=True)
-    username = db.Column(db.String(80))
-    password = db.Column(db.String(80))
+    username = db.Column(db.String(80), nullable=False)
+    pwd_hash = db.Column(db.String(80), nullable=False)
+    is_admin = db.Column(db.Boolean, nullable=False, default=False)
+    addressbooks = db.relationship('AddressBookModel', lazy='dynamic')
+
+    @property
+    def password(self):
+        raise AttributeError('can not read password property')
+
+    @password.setter
+    def password(self, password):
+        self.pwd_hash = generate_password_hash(password, 'sha256')
 
     def __init__(self, username, password):
         self.username = username
