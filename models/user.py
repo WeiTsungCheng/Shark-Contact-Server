@@ -8,11 +8,11 @@ from werkzeug.security import generate_password_hash
 
 class UserModel(db.Model):
     __tablename__ = "users"
-    id = db.Column(UUID(as_uuid=True), default=lambda: uuid4().hex, primary_key=True)
+    id = db.Column(UUID(as_uuid=True), default=lambda: uuid4(), primary_key=True)
     username = db.Column(db.String(80), nullable=False)
     pwd_hash = db.Column(db.String(80), nullable=False)
     is_admin = db.Column(db.Boolean, nullable=False, default=False)
-    addressbooks = db.relationship('AddressBookModel', lazy='dynamic')
+    addressbook = db.relationship('AddressBookModel', back_populates='user', uselist=False)
 
     @property
     def password(self):
