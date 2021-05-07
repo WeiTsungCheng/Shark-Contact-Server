@@ -5,14 +5,13 @@ from uuid import uuid4
 
 class ContactItemModel(db.Model):
     __tablename__ = "contactitems"
-
     id = db.Column(UUID(as_uuid=True), default=lambda: uuid4(), primary_key=True)
     itemname = db.Column(db.String(80))
     identity = db.Column(db.String(80))
     phonenumber =  db.Column(db.String(20))
 
-    addressbook_id = db.Column(UUID(as_uuid=True), db.ForeignKey('addressbooks.id'), unique=True)
-    addressbook = db.relationship('AddressBookModel', back_populates="contactitem")
+    addressbook_id = db.Column(UUID(as_uuid=True), db.ForeignKey('addressbooks.id'))
+    addressbook = db.relationship('AddressBookModel', back_populates="contactitems")
 
     def __init__(self, itemname, identity, phonenumber, addressbook_id):
         self.itemname = itemname
@@ -34,15 +33,18 @@ class ContactItemModel(db.Model):
             'id': self.id.hex,
             'itemname': self.itemname,
             'identity': self.identity,
-            'phonenumber': self.phonenumber,
-            'addressbook_id': self.addressbook_id.hex
+            'phonenumber': self.phonenumber
         }
 
     @classmethod
-    def find_by_addressbook_id(cls, _addressbook_id):
-        return cls.query.filter_by(addressbook_id=_addressbook_id).first()
+    def find_by_bookid_and_name(cls, _addressbook_id, _itemname):
+        return cls.query.filter_by(addressbook_id=_addressbook_id, itemname=_itemname).first()
 
     @classmethod
     def find_by_id(cls, _id):
         return cls.query.filter_by(id=_id).first()
+
+    @classmethod
+    def find_all(cls):
+        return cls.query.all()
 

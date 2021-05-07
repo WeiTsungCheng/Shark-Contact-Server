@@ -1,4 +1,4 @@
-from flask import Flask, jsonify
+from flask import Flask
 from flask_restful import Api
 
 from flask_jwt_extended import JWTManager
@@ -7,7 +7,7 @@ from db import db
 
 from resources.user import UserRegister, User, UserLogin, UserLogout, TokenRefresh
 from resources.addressbook import AddressBook
-from resources.contactItem import ContactItem
+from resources.contactItem import ContactItem, ContactItemList
 
 app = Flask(__name__)
 
@@ -29,8 +29,9 @@ api.add_resource(User, '/user/<uuid:user_id>')
 api.add_resource(UserLogin, '/login')
 api.add_resource(TokenRefresh, '/refresh')
 api.add_resource(UserLogout, "/logout")
-api.add_resource(AddressBook, "/user/addressbook")
-api.add_resource(ContactItem, "/user/addressbook/contactitem/<uuid:contactitem_id>")
+api.add_resource(AddressBook, "/user/addressbook/<string:bookname>")
+api.add_resource(ContactItem, "/user/addressbook/<string:bookname>/contactitem/<string:itemname>")
+api.add_resource(ContactItemList, "/user/addressbook/<string:bookname>/contactitems")
 
 if __name__ == '__main__':
     db.init_app(app)

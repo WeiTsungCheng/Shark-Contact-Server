@@ -29,6 +29,7 @@ _user_parser.add_argument('password',
                           )
 
 class UserRegister(Resource):
+
     def post(self):
         data = _user_parser.parse_args()
 
@@ -41,6 +42,7 @@ class UserRegister(Resource):
         return {"message": "User created successfully."}, 201
 
 class User(Resource):
+    # TODO Limit only admin can get and delete user
     @classmethod
     def get(cls, user_id: UUID):
         user = UserModel.find_by_id(user_id)

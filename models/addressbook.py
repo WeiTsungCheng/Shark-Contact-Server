@@ -1,4 +1,5 @@
 
+from models.contactItem import ContactItemModel
 from db import db
 from sqlalchemy.dialects.postgresql import UUID
 from uuid import uuid4
@@ -11,7 +12,7 @@ class AddressBookModel(db.Model):
     user_id = db.Column(UUID(as_uuid=True), db.ForeignKey('users.id'), unique=True)
     user = db.relationship('UserModel', back_populates="addressbook")
 
-    contactitem = db.relationship('ContactItemModel', back_populates='addressbook', uselist=True)
+    contactitems = db.relationship('ContactItemModel', back_populates='addressbook', uselist=True)
 
     def __init__(self, bookname, user_id):
         self.bookname = bookname
@@ -30,12 +31,8 @@ class AddressBookModel(db.Model):
         return {
             'id': self.id.hex,
             'bookname': self.bookname,
-            'user_id': self.user_id.hex
+            'contactitems': [item.json() for item in ContactItemModel.find_all()]
         }
-
-    @classmethod
-    def find_by_user_id(cls, _user_id):
-        return cls.query.filter_by(user_id=_user_id).first()
 
     @classmethod
     def find_by_id(cls, _id):

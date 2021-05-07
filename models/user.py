@@ -38,7 +38,8 @@ class UserModel(db.Model):
 
         return {
             'id': self.id.hex,
-            'username': self.username
+            'username': self.username,
+            'addressbook_name': self.addressbook.bookname if self.addressbook else None
         }
 
     @classmethod
