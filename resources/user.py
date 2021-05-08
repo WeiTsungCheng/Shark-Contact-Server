@@ -115,8 +115,10 @@ class UserLogin(Resource):
             refresh_token = create_refresh_token(user.id)
             return {
                 'user': user.json(),
-                'access_token': access_token,
-                'refresh_token': refresh_token
+                'token': {
+                    'access_token': access_token,
+                    'refresh_token': refresh_token
+                }
             }, 200
 
         return {"message": "Invalid Credentials!"}, 401
