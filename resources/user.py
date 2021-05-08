@@ -74,8 +74,7 @@ class AdminUserRegister(Resource):
 class User(Resource):
 
     @classmethod
-    def get(cls, user_id: UUID):
-
+    def get(cls, user_id):
         user = UserModel.find_by_id(user_id)
         if not user:
             return {'message': 'User Not Found'}, 404
@@ -83,12 +82,11 @@ class User(Resource):
         return user.json(), 200
 
     @classmethod
-    def delete(cls, user_id: UUID):
+    def delete(cls, user_id):
+
         user = UserModel.find_by_id(user_id)
         if not user:
             return {'message': 'User Not Found'}, 404
-        elif not user.is_admin:
-            return {'message': 'Only Admin Can Delete User'}, 401
 
         user.delete_from_db()
         return {'message': 'User deleted.'}, 200
