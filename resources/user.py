@@ -73,16 +73,27 @@ class AdminUserRegister(Resource):
 
 class User(Resource):
 
-    @classmethod
-    def get(cls, user_id):
+    @jwt_required()
+    def get(self, user_id):
+        jwt_user_id = get_jwt_identity()
+        jwt_user = UserModel.find_by_id(jwt_user_id)
+
+        if (not jwt_user.is_admin) and (jwt_user.id != user_id):
+            return {'message': 'Only Admin and Self can get User'}, 401
+
         user = UserModel.find_by_id(user_id)
         if not user:
             return {'message': 'User Not Found'}, 404
 
         return user.json(), 200
 
-    @classmethod
-    def delete(cls, user_id):
+    @jwt_required()
+    def delete(self, user_id):
+        jwt_user_id = get_jwt_identity()
+        jwt_user = UserModel.find_by_id(jwt_user_id)
+
+        if (not jwt_user.is_admin) and (jwt_user.id != user_id):
+            return {'message': 'Only Admin and Self can delete User'}, 401
 
         user = UserModel.find_by_id(user_id)
         if not user:
@@ -103,6 +114,7 @@ class UserLogin(Resource):
             access_token = create_access_token(identity=user.id, fresh=True)
             refresh_token = create_refresh_token(user.id)
             return {
+                'user': user.json(),
                 'access_token': access_token,
                 'refresh_token': refresh_token
             }, 200

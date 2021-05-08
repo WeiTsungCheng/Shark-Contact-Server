@@ -37,6 +37,10 @@ class ContactItemModel(db.Model):
         }
 
     @classmethod
+    def find_by_bookid(cls, _addressbook_id):
+        return cls.query.filter_by(addressbook_id=_addressbook_id)
+
+    @classmethod
     def find_by_bookid_and_name(cls, _addressbook_id, _itemname):
         return cls.query.filter_by(addressbook_id=_addressbook_id, itemname=_itemname).first()
 

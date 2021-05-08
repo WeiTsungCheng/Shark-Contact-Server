@@ -31,7 +31,7 @@ class AddressBookModel(db.Model):
         return {
             'id': self.id.hex,
             'bookname': self.bookname,
-            'contactitems': [item.json() for item in ContactItemModel.find_all()]
+            'contactitems': [item.json() for item in ContactItemModel.find_by_bookid(self.id)]
         }
 
     @classmethod
