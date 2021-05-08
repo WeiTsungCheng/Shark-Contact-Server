@@ -12,7 +12,7 @@ class UserModel(db.Model):
     username = db.Column(db.String(80), nullable=False)
     pwd_hash = db.Column(db.String(80), nullable=False)
     is_admin = db.Column(db.Boolean, nullable=False, default=False)
-    addressbook = db.relationship('AddressBookModel', back_populates='user', uselist=False)
+    addressbook = db.relationship('AddressBookModel', back_populates='user', uselist=False, passive_deletes=True)
 
     @property
     def password(self):
@@ -38,7 +38,7 @@ class UserModel(db.Model):
     def json(self):
 
         return {
-            'id': self.id.hex,
+            'id': str(self.id),
             'username': self.username,
             'addressbook_name': self.addressbook.bookname if self.addressbook else None
         }

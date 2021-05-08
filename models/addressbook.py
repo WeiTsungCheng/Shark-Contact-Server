@@ -9,7 +9,7 @@ class AddressBookModel(db.Model):
     id = db.Column(UUID(as_uuid=True), default=lambda: uuid4(), primary_key=True)
     bookname = db.Column(db.String(80))
 
-    user_id = db.Column(UUID(as_uuid=True), db.ForeignKey('users.id'), unique=True)
+    user_id = db.Column(UUID(as_uuid=True), db.ForeignKey('users.id', ondelete='CASCADE'), unique=True)
     user = db.relationship('UserModel', back_populates="addressbook")
 
     contactitems = db.relationship('ContactItemModel', back_populates='addressbook', uselist=True)
@@ -29,7 +29,7 @@ class AddressBookModel(db.Model):
     def json(self):
 
         return {
-            'id': self.id.hex,
+            'id': str(self.id),
             'bookname': self.bookname,
             'contactitems': [item.json() for item in ContactItemModel.find_by_bookid(self.id)]
         }

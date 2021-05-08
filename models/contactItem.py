@@ -30,7 +30,7 @@ class ContactItemModel(db.Model):
     def json(self):
 
         return {
-            'id': self.id.hex,
+            'id': str(self.id),
             'itemname': self.itemname,
             'identity': self.identity,
             'phonenumber': self.phonenumber
