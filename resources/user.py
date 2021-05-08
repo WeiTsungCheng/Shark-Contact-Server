@@ -14,6 +14,7 @@ from flask_jwt_extended import (
 from blacklist import BLACKLIST
 
 from models.user import UserModel
+from distutils.util import strtobool
 
 _user_parser = reqparse.RequestParser()
 _user_parser.add_argument('username',
@@ -28,6 +29,20 @@ _user_parser.add_argument('password',
                           help="This field cannot be blank."
                           )
 
+_user_parser.add_argument('is_admin',
+                          type=str,
+                          required=False,
+                          help="This field cannot be blank."
+                          )
+
+_user_parser.add_argument('adminkey',
+                          type=str,
+                          required=False,
+                          help="This field cannot be blank."
+                          )
+
+import os
+
 class UserRegister(Resource):
 
     def post(self):
@@ -36,15 +51,31 @@ class UserRegister(Resource):
         if UserModel.find_by_username(data['username']):
             return {"message": "A user with that username already exists"}, 400
 
-        user = UserModel(**data)
+        user = UserModel(data['username'], data['password'])
         user.save_to_db()
 
         return {"message": "User created successfully."}, 201
 
+class AdminUserRegister(Resource):
+
+    def post(self):
+        data = _user_parser.parse_args()
+        if UserModel.find_by_username(data['username']):
+            return {"message": "A user with that username already exists"}, 400
+
+        if os.getenv('ADMIN_USER_KEY') != data['adminkey']:
+            return {"message": "Can't Register"}, 401
+
+        user = UserModel(data['username'], data['password'], strtobool(data["is_admin"]))
+        user.save_to_db()
+
+        return {"message": "Admin created successfully."}, 201
+
 class User(Resource):
-    # TODO Limit only admin can get and delete user
+
     @classmethod
     def get(cls, user_id: UUID):
+
         user = UserModel.find_by_id(user_id)
         if not user:
             return {'message': 'User Not Found'}, 404
@@ -56,6 +87,9 @@ class User(Resource):
         user = UserModel.find_by_id(user_id)
         if not user:
             return {'message': 'User Not Found'}, 404
+        elif not user.is_admin:
+            return {'message': 'Only Admin Can Delete User'}, 401
+
         user.delete_from_db()
         return {'message': 'User deleted.'}, 200
 

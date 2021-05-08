@@ -89,6 +89,7 @@ class ContactItem(Resource):
 
     @jwt_required()
     def put(self, bookname, itemname):
+
         user_id = get_jwt_identity()
         user = UserModel.find_by_id(user_id)
 

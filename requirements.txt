@@ -4,3 +4,4 @@ Flask-SQLAlchemy
 psycopg2-binary
 postgres
 pycrypto
+python-dotenv

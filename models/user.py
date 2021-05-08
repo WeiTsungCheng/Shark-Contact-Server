@@ -22,9 +22,10 @@ class UserModel(db.Model):
     def password(self, password):
         self.pwd_hash = generate_password_hash(password, 'sha256')
 
-    def __init__(self, username, password):
+    def __init__(self, username, password, is_admin=False):
         self.username = username
         self.password = password
+        self.is_admin = is_admin
 
     def save_to_db(self):
         db.session.add(self)
