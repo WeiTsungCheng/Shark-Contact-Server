@@ -10,7 +10,7 @@ class ContactItemModel(db.Model):
     identity = db.Column(db.String(80))
     phonenumber =  db.Column(db.String(20))
 
-    addressbook_id = db.Column(UUID(as_uuid=True), db.ForeignKey('addressbooks.id'))
+    addressbook_id = db.Column(UUID(as_uuid=True), db.ForeignKey('addressbooks.id', ondelete='CASCADE'))
     addressbook = db.relationship('AddressBookModel', back_populates="contactitems")
 
     def __init__(self, itemname, identity, phonenumber, addressbook_id):

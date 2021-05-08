@@ -12,7 +12,7 @@ class AddressBookModel(db.Model):
     user_id = db.Column(UUID(as_uuid=True), db.ForeignKey('users.id', ondelete='CASCADE'), unique=True)
     user = db.relationship('UserModel', back_populates="addressbook")
 
-    contactitems = db.relationship('ContactItemModel', back_populates='addressbook', uselist=True)
+    contactitems = db.relationship('ContactItemModel', back_populates='addressbook', uselist=True, passive_deletes=True)
 
     def __init__(self, bookname, user_id):
         self.bookname = bookname
