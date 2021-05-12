@@ -65,7 +65,9 @@ class AdminUserRegister(Resource):
 
         if os.getenv('ADMIN_USER_KEY') != data['adminkey']:
             return {"message": "Can't Register"}, 401
-
+        print(data["is_admin"])
+        print(type(data["is_admin"]))
+        print(strtobool(data["is_admin"]))
         user = UserModel(data['username'], data['password'], strtobool(data["is_admin"]))
         user.save_to_db()
 
@@ -114,7 +116,7 @@ class UserLogin(Resource):
             access_token = create_access_token(identity=user.id, fresh=True)
             refresh_token = create_refresh_token(user.id)
             return {
-                'user': user.json(),
+                'user_id': str(user.id),
                 'token': {
                     'access_token': access_token,
                     'refresh_token': refresh_token
@@ -129,6 +131,7 @@ class UserLogout(Resource):
     def post(self):
         jti = get_jwt()['jti']
         BLACKLIST.add(jti)
+
         return {"message": "Successfully logout out"}, 200
 
 
