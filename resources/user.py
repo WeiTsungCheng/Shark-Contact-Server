@@ -41,17 +41,33 @@ _user_parser.add_argument('adminkey',
                           help="This field cannot be blank."
                           )
 
+_user_parser.add_argument('identity',
+                          type=str,
+                          required=False,
+                          help="This field cannot be blank."
+                          )
+
+_user_parser.add_argument('phone_number',
+                          type=str,
+                          required=False,
+                          help="This field cannot be blank."
+                          )
+
 import os
 
 class UserRegister(Resource):
 
     def post(self):
+
         data = _user_parser.parse_args()
+
+        if (not data['identity']) or (not data['phone_number']):
+           return {"message": "identity and phone_number must be provided"}, 400
 
         if UserModel.find_by_username(data['username']):
             return {"message": "A user with that username already exists"}, 400
 
-        user = UserModel(data['username'], data['password'])
+        user = UserModel(data['username'], data['password'], data['identity'], data['phone_number'])
         user.save_to_db()
 
         return {"message": "User created successfully."}, 201
@@ -60,15 +76,17 @@ class AdminUserRegister(Resource):
 
     def post(self):
         data = _user_parser.parse_args()
+
+        if (not data['identity']) or (not data['phone_number']):
+           return {"message": "identity and phone_number must be provided"}, 400
+
         if UserModel.find_by_username(data['username']):
             return {"message": "A user with that username already exists"}, 400
 
         if os.getenv('ADMIN_USER_KEY') != data['adminkey']:
             return {"message": "Can't Register"}, 401
-        print(data["is_admin"])
-        print(type(data["is_admin"]))
-        print(strtobool(data["is_admin"]))
-        user = UserModel(data['username'], data['password'], strtobool(data["is_admin"]))
+
+        user = UserModel(data['username'], data['password'], data['identity'], data['phone_number'], strtobool(data["is_admin"]))
         user.save_to_db()
 
         return {"message": "Admin created successfully."}, 201

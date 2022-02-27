@@ -12,16 +12,20 @@ from resources.contactItem import ContactItem, ContactItemList
 import os
 from dotenv import load_dotenv
 
+
 app = Flask(__name__)
 
+# 切記要先 load 才取得到 .env 的資料
+load_dotenv()
+
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv("DB_HOST")
+
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['PROPAGATE_EXCEPTIONS'] = True
 
 app.secret_key = os.getenv('SECRET_KEY')
 api = Api(app)
 
-load_dotenv()
 
 @app.before_first_request
 def create_tables():
@@ -41,4 +45,4 @@ api.add_resource(AdminUserRegister, "/admin/register")
 
 if __name__ == '__main__':
     db.init_app(app)
-    app.run(port=8069, debug=True)
+    app.run(port=8069, debug=False)
