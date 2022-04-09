@@ -62,10 +62,13 @@ class UserRegister(Resource):
         data = _user_parser.parse_args()
 
         if (not data['identity']) or (not data['phone_number']):
-           return {"message": "identity and phone_number must be provided"}, 400
+            return {"message": "identity and phone_number must be provided"}, 400
 
         if UserModel.find_by_username(data['username']):
             return {"message": "A user with that username already exists"}, 400
+
+        if UserModel.find_by_identity(data['identity']):
+            return {"message": "A user with that identity already exists"}, 400
 
         user = UserModel(data['username'], data['password'], data['identity'], data['phone_number'])
         user.save_to_db()
@@ -94,33 +97,54 @@ class AdminUserRegister(Resource):
 class User(Resource):
 
     @jwt_required()
-    def get(self, user_id):
+    def get(self):
         jwt_user_id = get_jwt_identity()
         jwt_user = UserModel.find_by_id(jwt_user_id)
 
-        if (not jwt_user.is_admin) and (jwt_user.id != user_id):
-            return {'message': 'Only Admin and Self can get User'}, 401
-
-        user = UserModel.find_by_id(user_id)
-        if not user:
+        if not jwt_user:
             return {'message': 'User Not Found'}, 404
 
-        return user.json(), 200
+        return jwt_user.json(), 200
 
     @jwt_required()
-    def delete(self, user_id):
+    def delete(self):
         jwt_user_id = get_jwt_identity()
         jwt_user = UserModel.find_by_id(jwt_user_id)
 
-        if (not jwt_user.is_admin) and (jwt_user.id != user_id):
-            return {'message': 'Only Admin and Self can delete User'}, 401
-
-        user = UserModel.find_by_id(user_id)
-        if not user:
+        if not jwt_user:
             return {'message': 'User Not Found'}, 404
 
-        user.delete_from_db()
+        jwt_user.delete_from_db()
+
         return {'message': 'User deleted.'}, 200
+    # @jwt_required()
+    # def get(self, user_id):
+    #     jwt_user_id = get_jwt_identity()
+    #     jwt_user = UserModel.find_by_id(jwt_user_id)
+
+    #     if (not jwt_user.is_admin) and (jwt_user.id != user_id):
+    #         return {'message': 'Only Admin and Self can get User'}, 401
+
+    #     user = UserModel.find_by_id(user_id)
+    #     if not user:
+    #         return {'message': 'User Not Found'}, 404
+
+    #     return user.json(), 200
+
+    # @jwt_required()
+    # def delete(self, user_id):
+    #     jwt_user_id = get_jwt_identity()
+    #     jwt_user = UserModel.find_by_id(jwt_user_id)
+
+    #     if (not jwt_user.is_admin) and (jwt_user.id != user_id):
+    #         return {'message': 'Only Admin and Self can delete User'}, 401
+
+    #     user = UserModel.find_by_id(user_id)
+    #     if not user:
+    #         return {'message': 'User Not Found'}, 404
+
+    #     user.delete_from_db()
+    #     return {'message': 'User deleted.'}, 200
 
 
 class UserLogin(Resource):
@@ -144,9 +168,9 @@ class UserLogin(Resource):
         return {"message": "Invalid Credentials!"}, 401
 
 class UserLogout(Resource):
-
     @jwt_required()
     def post(self):
+
         jti = get_jwt()['jti']
         BLACKLIST.add(jti)
 
