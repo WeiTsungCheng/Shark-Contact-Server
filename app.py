@@ -5,7 +5,7 @@ from flask_jwt_extended import JWTManager
 
 from db import db
 
-from resources.user import UserRegister, User, UserLogin, UserLogout, TokenRefresh, AdminUserRegister
+from resources.user import UserRegister, User, UserLogin, UserLogout, TokenRefresh #, AdminUserRegister
 from resources.addressbook import AddressBook
 from resources.contactItem import ContactItem, ContactItemList
 
@@ -46,9 +46,9 @@ api.add_resource(UserLogin, '/login')
 api.add_resource(TokenRefresh, '/refresh')
 api.add_resource(UserLogout, "/logout")
 api.add_resource(AddressBook, "/user/addressbook/<string:bookname>")
-api.add_resource(ContactItem, "/user/addressbook/<string:bookname>/contactitem/<string:itemname>")
+api.add_resource(ContactItem, "/user/addressbook/<string:bookname>/contactitem/<string:username>")
 api.add_resource(ContactItemList, "/user/addressbook/<string:bookname>/contactitems")
-api.add_resource(AdminUserRegister, "/admin/register")
+# api.add_resource(AdminUserRegister, "/admin/register")
 
 if __name__ == '__main__':
     db.init_app(app)

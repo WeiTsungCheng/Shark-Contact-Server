@@ -2,6 +2,7 @@
 from sqlalchemy.dialects.postgresql.base import UUID
 from flask_restful import Resource, reqparse
 from werkzeug.security import check_password_hash
+import datetime
 
 from flask_jwt_extended import (
     create_access_token,
@@ -75,24 +76,24 @@ class UserRegister(Resource):
 
         return {"message": "User created successfully."}, 201
 
-class AdminUserRegister(Resource):
+# class AdminUserRegister(Resource):
 
-    def post(self):
-        data = _user_parser.parse_args()
+#     def post(self):
+#         data = _user_parser.parse_args()
 
-        if (not data['identity']) or (not data['phone_number']):
-           return {"message": "identity and phone_number must be provided"}, 400
+#         if (not data['identity']) or (not data['phone_number']):
+#            return {"message": "identity and phone_number must be provided"}, 400
 
-        if UserModel.find_by_username(data['username']):
-            return {"message": "A user with that username already exists"}, 400
+#         if UserModel.find_by_username(data['username']):
+#             return {"message": "A user with that username already exists"}, 400
 
-        if os.getenv('ADMIN_USER_KEY') != data['adminkey']:
-            return {"message": "Can't Register"}, 401
+#         if os.getenv('ADMIN_USER_KEY') != data['adminkey']:
+#             return {"message": "Can't Register"}, 401
 
-        user = UserModel(data['username'], data['password'], data['identity'], data['phone_number'], strtobool(data["is_admin"]))
-        user.save_to_db()
+#         user = UserModel(data['username'], data['password'], data['identity'], data['phone_number'], strtobool(data["is_admin"]))
+#         user.save_to_db()
 
-        return {"message": "Admin created successfully."}, 201
+#         return {"message": "Admin created successfully."}, 201
 
 class User(Resource):
 
@@ -155,7 +156,7 @@ class UserLogin(Resource):
         user = UserModel.find_by_username(data['username'])
 
         if user and check_password_hash(user.pwd_hash, data['password']):
-            access_token = create_access_token(identity=user.id, fresh=True)
+            access_token = create_access_token(identity=user.id, fresh=True, expires_delta=datetime.timedelta(days=1))
             refresh_token = create_refresh_token(user.id)
             return {
                 'user_id': str(user.id),
@@ -182,7 +183,7 @@ class TokenRefresh(Resource):
     @jwt_required(refresh=True)
     def post(self):
         current_user = get_jwt_identity()
-        new_token = create_access_token(identity=current_user, fresh=False)
+        new_token = create_access_token(identity=current_user, fresh=False, expires_delta=datetime.timedelta(days=1))
         return {
             "token": {"access_token": new_token}
         }, 200
