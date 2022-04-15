@@ -46,7 +46,7 @@ api.add_resource(UserLogin, '/login')
 api.add_resource(TokenRefresh, '/refresh')
 api.add_resource(UserLogout, "/logout")
 api.add_resource(AddressBook, "/user/addressbook/<string:bookname>")
-api.add_resource(ContactItem, "/user/addressbook/<string:bookname>/contactitem/<string:username>")
+api.add_resource(ContactItem, "/user/addressbook/<string:bookname>/contactitem/<string:itemname>")
 api.add_resource(ContactItemList, "/user/addressbook/<string:bookname>/contactitems")
 # api.add_resource(AdminUserRegister, "/admin/register")
 

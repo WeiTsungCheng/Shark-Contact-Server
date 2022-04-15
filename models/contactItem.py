@@ -6,15 +6,15 @@ from uuid import uuid4
 class ContactItemModel(db.Model):
     __tablename__ = "contactitems"
     id = db.Column(UUID(as_uuid=True), default=lambda: uuid4(), primary_key=True)
-    username = db.Column(db.String(80))
+    itemname = db.Column(db.String(80))
     identity = db.Column(db.String(80))
     phonenumber =  db.Column(db.String(20))
 
     addressbook_id = db.Column(UUID(as_uuid=True), db.ForeignKey('addressbooks.id', ondelete='CASCADE'))
     addressbook = db.relationship('AddressBookModel', back_populates="contactitems")
 
-    def __init__(self, username, identity, phonenumber, addressbook_id):
-        self.username = username
+    def __init__(self, itemname, identity, phonenumber, addressbook_id):
+        self.itemname = itemname
         self.identity = identity
         self.phonenumber = phonenumber
         self.addressbook_id = addressbook_id
@@ -31,7 +31,7 @@ class ContactItemModel(db.Model):
 
         return {
             'id': str(self.id),
-            'username': self.username,
+            'itemname': self.itemname,
             'identity': self.identity,
             'phonenumber': self.phonenumber
         }
@@ -41,8 +41,8 @@ class ContactItemModel(db.Model):
         return cls.query.filter_by(addressbook_id=_addressbook_id)
 
     @classmethod
-    def find_by_bookid_and_name(cls, _addressbook_id, _username):
-        return cls.query.filter_by(addressbook_id=_addressbook_id, username=_username).first()
+    def find_by_bookid_and_name(cls, _addressbook_id, _itemname):
+        return cls.query.filter_by(addressbook_id=_addressbook_id, itemname=_itemname).first()
 
     @classmethod
     def find_by_id(cls, _id):

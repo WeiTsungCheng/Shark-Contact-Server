@@ -26,7 +26,7 @@ _contact_parser.add_argument('phonenumber',
 class ContactItem(Resource):
 
     @jwt_required()
-    def get(self, bookname, username):
+    def get(self, bookname, itemname):
 
         user_id = get_jwt_identity()
         user = UserModel.find_by_id(user_id)
@@ -36,14 +36,14 @@ class ContactItem(Resource):
             return {'message': 'Addressbook name not found'}, 404
 
         contactitems = user.addressbook.contactitems
-        contactItem = list(filter(lambda item: item.username == username, contactitems))
+        contactItem = list(filter(lambda item: item.itemname == itemname, contactitems))
 
         if contactItem:
             return contactItem[0].json()
         return {'message': 'ContactItem not found'}, 404
 
     @jwt_required()
-    def post(self, bookname, username):
+    def post(self, bookname, itemname):
 
         user_id = get_jwt_identity()
         user = UserModel.find_by_id(user_id)
@@ -55,12 +55,12 @@ class ContactItem(Resource):
         addressbook_id = user.addressbook.id if user.addressbook else None
         data = _contact_parser.parse_args()
 
-        contactItem = ContactItemModel.find_by_bookid_and_name(addressbook_id, username)
+        contactItem = ContactItemModel.find_by_bookid_and_name(addressbook_id, itemname)
 
         if contactItem:
             return {'message': "An contactItem already exists."}, 400
         else:
-            contactItem = ContactItemModel(username, data['identity'], data['phonenumber'], addressbook_id)
+            contactItem = ContactItemModel(itemname, data['identity'], data['phonenumber'], addressbook_id)
 
         try:
             contactItem.save_to_db()
@@ -70,7 +70,7 @@ class ContactItem(Resource):
         return contactItem.json(), 201
 
     @jwt_required()
-    def delete(self, bookname, username):
+    def delete(self, bookname, itemname):
 
         user_id = get_jwt_identity()
         user = UserModel.find_by_id(user_id)
@@ -80,7 +80,7 @@ class ContactItem(Resource):
             return {'message': 'Addressbook name not found'}, 404
 
         contactitems = user.addressbook.contactitems
-        contactItem = list(filter(lambda item: item.username == username, contactitems))
+        contactItem = list(filter(lambda item: item.itemname == itemname, contactitems))
 
         if contactItem:
             contactItem[0].delete_from_db()
@@ -88,7 +88,7 @@ class ContactItem(Resource):
         return {'message': 'ContactItem not found'}, 404
 
     @jwt_required()
-    def put(self, bookname, username):
+    def put(self, bookname, itemname):
 
         user_id = get_jwt_identity()
         user = UserModel.find_by_id(user_id)
@@ -100,12 +100,12 @@ class ContactItem(Resource):
         addressbook_id = user.addressbook.id if user.addressbook else None
         data = _contact_parser.parse_args()
 
-        contactItem = ContactItemModel.find_by_bookid_and_name(addressbook_id, username)
+        contactItem = ContactItemModel.find_by_bookid_and_name(addressbook_id, itemname)
         if contactItem:
             contactItem.identity = data['identity']
             contactItem.phonenumber = data['phonenumber']
         else:
-            contactItem = ContactItemModel(username, data['identity'], data['phonenumber'], addressbook_id)
+            contactItem = ContactItemModel(itemname, data['identity'], data['phonenumber'], addressbook_id)
 
         try:
             contactItem.save_to_db()
