@@ -98,10 +98,12 @@ class AddressBook(Resource):
             else:
                 return {'message': 'Addressbook not found'}, 404
 
-                # addressbook.bookname = bookname
         else:
             addressbook = AddressBookModel(bookname, uuid.UUID(user_id))
 
-        addressbook.save_to_db()
+        try:
+            addressbook.save_to_db()
+        except Exception as e:
+            return {"message": "An error occurred inserting the Addressbook. '{}'".format(e)}, 500
 
-        return addressbook.json()
+        return addressbook.json(), 201

@@ -11,6 +11,12 @@ from models.contactItem import ContactItemModel
 
 _contact_parser = reqparse.RequestParser()
 
+_contact_parser.add_argument('itemname',
+                          type=str,
+                          required=False,
+                          help="This field can not be blank."
+                          )
+
 _contact_parser.add_argument('identity',
                           type=str,
                           required=True,
@@ -92,6 +98,8 @@ class ContactItem(Resource):
 
         user_id = get_jwt_identity()
         user = UserModel.find_by_id(user_id)
+        if user == None:
+            return  {'message': 'User not found'}, 404
 
         addressbook_name = user.addressbook.bookname if user.addressbook else None
         if addressbook_name != bookname:
@@ -100,10 +108,21 @@ class ContactItem(Resource):
         addressbook_id = user.addressbook.id if user.addressbook else None
         data = _contact_parser.parse_args()
 
+        newContactItem = ContactItemModel.find_by_bookid_and_name(addressbook_id, data['itemname'])
+        if newContactItem:
+            return {'message': "An contactItem already exists."}, 400
+
         contactItem = ContactItemModel.find_by_bookid_and_name(addressbook_id, itemname)
+
         if contactItem:
-            contactItem.identity = data['identity']
-            contactItem.phonenumber = data['phonenumber']
+
+            if contactItem.itemname == itemname:
+                contactItem.itemname = data['itemname']
+                contactItem.identity = data['identity']
+                contactItem.phonenumber = data['phonenumber']
+            else:
+                return {'message': 'ContactItem not found'}, 404
+
         else:
             contactItem = ContactItemModel(itemname, data['identity'], data['phonenumber'], addressbook_id)
 
