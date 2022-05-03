@@ -26,7 +26,11 @@ else:
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['PROPAGATE_EXCEPTIONS'] = True
 
-app.secret_key = os.getenv('SECRET_KEY')
+if os.environ.get('SECRET_KEY'):
+    app.secret_key = os.environ.get('SECRET_KEY')
+else:
+    app.secret_key = os.getenv('SECRET_KEY')
+
 api = Api(app)
 
 
