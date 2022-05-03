@@ -18,7 +18,10 @@ app = Flask(__name__)
 # 切記要先 load 才取得到 .env 的資料
 load_dotenv()
 
-app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv("DB_HOST")
+if os.environ.get('DATABASE_URL'):
+    app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL').replace("postgres://", "postgresql://", 1)
+else:
+    app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv("DB_HOST")
 
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['PROPAGATE_EXCEPTIONS'] = True
@@ -53,4 +56,4 @@ api.add_resource(ContactItemList, "/user/addressbook/<string:bookname>/contactit
 if __name__ == '__main__':
     db.init_app(app)
     # debug 設為 True 可以存擋後可以自動 reload , 不用重啟 Server , 但是要使用 VS code debug 需設為 False
-    app.run(port=8069, debug=False)
+    app.run(port=5000, debug=False)
