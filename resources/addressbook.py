@@ -1,5 +1,4 @@
 
-from tkinter.messagebox import NO
 from models.user import UserModel
 from models.addressbook import AddressBookModel
 from flask_restful import Resource, reqparse
