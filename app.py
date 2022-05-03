@@ -56,4 +56,4 @@ api.add_resource(ContactItemList, "/user/addressbook/<string:bookname>/contactit
 if __name__ == '__main__':
     db.init_app(app)
     # debug 設為 True 可以存擋後可以自動 reload , 不用重啟 Server , 但是要使用 VS code debug 需設為 False
-    app.run(port=5000, debug=False)
+    app.run(port=8069, debug=False)
