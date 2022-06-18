@@ -14,7 +14,6 @@ from dotenv import load_dotenv
 from blacklist import BLACKLIST
 
 app = Flask(__name__)
-
 # 切記要先 load 才取得到 .env 的資料
 load_dotenv()
 
