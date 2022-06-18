@@ -108,23 +108,14 @@ class ContactItem(Resource):
         addressbook_id = user.addressbook.id if user.addressbook else None
         data = _contact_parser.parse_args()
 
-        newContactItem = ContactItemModel.find_by_bookid_and_name(addressbook_id, data['itemname'])
-        if newContactItem:
-            return {'message': "An contactItem already exists."}, 400
-
         contactItem = ContactItemModel.find_by_bookid_and_name(addressbook_id, itemname)
 
         if contactItem:
-
-            if contactItem.itemname == itemname:
-                contactItem.itemname = data['itemname']
-                contactItem.identity = data['identity']
-                contactItem.phonenumber = data['phonenumber']
-            else:
-                return {'message': 'ContactItem not found'}, 404
-
+            contactItem.itemname = data['itemname']
+            contactItem.identity = data['identity']
+            contactItem.phonenumber = data['phonenumber']
         else:
-            contactItem = ContactItemModel(itemname, data['identity'], data['phonenumber'], addressbook_id)
+            return {'message': 'ContactItem not found'}, 404
 
         try:
             contactItem.save_to_db()
